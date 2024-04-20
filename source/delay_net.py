@@ -150,10 +150,10 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
        switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 200 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 200ms')  #originally 50 ms
-       #switch3.cmdPrint('tc qdisc del dev s3-eth0 root')
-       #switch3.cmdPrint('tc qdisc add dev s3-eth0 root handle 10: netem delay 200ms') #originally 50 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 200ms')  #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s3-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s3-eth0 root handle 10: netem delay 200ms') #originally 50 ms
 
        #switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
        #switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 50ms')  #originally 10 ms 
@@ -170,10 +170,10 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
        switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 200 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 10ms')  #originally 50 ms
-       #switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       #switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 10ms')  #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
 
        #switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
        #switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 200ms')  #originally 10 ms 
@@ -190,10 +190,10 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
        switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 50ms')  #originally 50 ms
-       #switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       #switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 50ms')  #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
 
        #switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
        #switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 10ms')  #originally 10 ms 
