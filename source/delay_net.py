@@ -150,15 +150,15 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
        switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 200 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth2 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth2 root handle 10: netem delay 200ms')  #originally 50 ms
-       #switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       #switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 50 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 200ms')  #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s3-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s3-eth0 root handle 10: netem delay 200ms') #originally 50 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 50ms')  #originally 10 ms 
-       #switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
-       #switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 10 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 50ms')  #originally 10 ms 
+       switch4.cmdPrint('tc qdisc del dev s4-eth0 root')
+       switch4.cmdPrint('tc qdisc add dev s4-eth0 root handle 10: netem delay 50ms') #originally 10 ms
 
        info( '+++++++++++++ First change started\n' )
 
@@ -170,15 +170,35 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
        switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 200 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth2 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth2 root handle 10: netem delay 10ms')  #originally 50 ms
-       #switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       #switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 10ms')  #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
 
-       #switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
-       #switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 200ms')  #originally 10 ms 
-       #switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
-       #switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 10 ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 200ms')  #originally 10 ms 
+       switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 10 ms
+
+       info( '+++++++++++++ Second change started\n' )
+
+    def cDelay3(): #function called back to set the link delay to 200ms
+       #switch.cmdPrint('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
+       switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 200ms')  #originally 200 ms
+       #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
+       switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200 ms
+
+       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 50ms')  #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+
+       switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 10ms')  #originally 10 ms 
+       switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 10 ms
 
        info( '+++++++++++++ Second change started\n' )
 
@@ -186,12 +206,16 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     # From this moment, the network is going to route with the inter-switch link delay equal 10 ms (inintial value)
     # The two timers set below will set two another link delay values in the 15th and 30th second of the experiment.
     # Note: 45sec long ping run determines the duration of the whole experiment.
+
     switch1.cmdPrint('ip a')
     switch2.cmdPrint('ip a')
+    switch3.cmdPrint('ip a')
+    switch4.cmdPrint('ip a')
+    switch5.cmdPrint('ip a')
     info( '+++++++++++++ Setting t1   ' )
     "Timer t1 is set to trigger function cDelay1 after the period of 21 sec which will set link delay to 200ms"
     "When t1 expires, cDelay1 is triggered and link delay is set to 50ms"
-    t1=Timer(21, cDelay1)
+    t1=Timer(18, cDelay1)
     t1.start()
     info( '+++++++++++++ t1 started\n' )
 
@@ -202,6 +226,10 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     t2.start()
     info( '+++++++++++++ t2 started\n' )
 
+    t3=Timer(54, cDelay3)
+    t3.start()
+    info( '+++++++++++++ t3 started\n' )
+
     info( "\n*** Running the test\n\n" )
 
     # Generate 45 ICMP echo requests, one per second, which accounts to 45 seconds
@@ -209,7 +237,7 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     " All values (includig -c 51 in the ping command) have been tuned to provide an equal"
     " number of 15 ICMP echoes in each iteration."
     " Note also h0-to-h1 ping delay (RTT) will include delays h0-switch and switch1-h1"
-    h1.cmdPrint( 'ping -i 1 -c 51 ' + h4.IP() )
+    h1.cmdPrint( 'ping -i 1 -c 70 ' + h4.IP() )
 
     sleep( 1 )
     info( "*** Stopping the network\n" )
