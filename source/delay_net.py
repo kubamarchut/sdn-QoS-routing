@@ -200,7 +200,7 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
        switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 10 ms
 
-       info( '+++++++++++++ Second change started\n' )
+       info( '+++++++++++++ Third change started\n' )
 
 
     # From this moment, the network is going to route with the inter-switch link delay equal 10 ms (inintial value)
@@ -226,6 +226,7 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     t2.start()
     info( '+++++++++++++ t2 started\n' )
 
+    info( '+++++++++++++ Setting t3   ' )
     t3=Timer(54, cDelay3)
     t3.start()
     info( '+++++++++++++ t3 started\n' )
