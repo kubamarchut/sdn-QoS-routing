@@ -52,31 +52,31 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     link12 = TCLink( switch5, h6, **linkopts0)
 
     "print link0.intf1, link0.intf2"
-    link1.intf2.setMAC("0:1:0:0:0:1") #h1-s1
+    link1.intf1.setMAC("0:1:0:0:0:1") #h1-s1
     link2.intf2.setMAC("0:1:0:0:0:2") #h2-s1
-    link3.intf2.setMAC("0:1:0:0:0:3") #h3-s1
+    link3.intf3.setMAC("0:1:0:0:0:3") #h3-s1
 
-    link4.intf1.setMAC("0:1:0:0:0:4") #s1-s2
-    link4.intf2.setMAC("0:2:0:0:0:1") #s2-s1
+    link4.intf4.setMAC("0:1:0:0:0:4") #s1-s2
+    link4.intf1.setMAC("0:2:0:0:0:1") #s2-s1
 
-    link5.intf1.setMAC("0:1:0:0:0:5") #s1-s3
-    link5.intf2.setMAC("0:3:0:0:0:1") #s3-s1
+    link5.intf5.setMAC("0:1:0:0:0:5") #s1-s3
+    link5.intf1.setMAC("0:3:0:0:0:1") #s3-s1
 
-    link6.intf1.setMAC("0:1:0:0:0:6") #s1-s4
-    link6.intf2.setMAC("0:4:0:0:0:1") #s4-s1
+    link6.intf6.setMAC("0:1:0:0:0:6") #s1-s4
+    link6.intf1.setMAC("0:4:0:0:0:1") #s4-s1
 
-    link7.intf1.setMAC("0:2:0:0:0:2") #s2-s5
-    link7.intf2.setMAC("0:5:0:0:0:1") #s5-s2
+    link7.intf2.setMAC("0:2:0:0:0:2") #s2-s5
+    link7.intf1.setMAC("0:5:0:0:0:1") #s5-s2
 
-    link8.intf1.setMAC("0:3:0:0:0:2") #s3-s5
+    link8.intf2.setMAC("0:3:0:0:0:2") #s3-s5
     link8.intf2.setMAC("0:5:0:0:0:2") #s5-s3
 
-    link9.intf1.setMAC("0:4:0:0:0:2") #s4-s5
-    link9.intf2.setMAC("0:5:0:0:0:3") #s5-s4
+    link9.intf2.setMAC("0:4:0:0:0:2") #s4-s5
+    link9.intf3.setMAC("0:5:0:0:0:3") #s5-s4
 
-    link10.intf2.setMAC("0:5:0:0:0:4") #s5-h4
-    link11.intf2.setMAC("0:5:0:0:0:5") #s5-h5
-    link12.intf2.setMAC("0:5:0:0:0:6") #s5-h6
+    link10.intf4.setMAC("0:5:0:0:0:4") #s5-h4
+    link11.intf5.setMAC("0:5:0:0:0:5") #s5-h5
+    link12.intf6.setMAC("0:5:0:0:0:6") #s5-h6
 
     info( "*** Configuring hosts\n" )
     h1.setIP( '192.168.123.1/24' )
