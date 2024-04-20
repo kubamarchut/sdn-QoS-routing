@@ -213,32 +213,32 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     switch4.cmdPrint('ip a')
     switch5.cmdPrint('ip a')
 
-    def updateDelays():
-        cDelay1()
-        Timer(15, cDelay2).start()
-        Timer(30, cDelay3).start()
-        Timer(45, updateDelays).start()
+    #def updateDelays():
+    #    cDelay1()
+    #    Timer(15, cDelay2).start()
+    #    Timer(30, cDelay3).start()
+    #    Timer(45, updateDelays).start()
 
-    updateDelays()
+    #updateDelays()
 
-    #info( '+++++++++++++ Setting t1   ' )
+    info( '+++++++++++++ Setting t1   ' )
     "Timer t1 is set to trigger function cDelay1 after the period of 21 sec which will set link delay to 200ms"
     "When t1 expires, cDelay1 is triggered and link delay is set to 50ms"
-    #t1=Timer(18, cDelay1)
-    #t1.start()
-    #info( '+++++++++++++ t1 started\n' )
+    t1=Timer(18, cDelay1)
+    t1.start()
+    info( '+++++++++++++ t1 started\n' )
 
-    #info( '+++++++++++++ Setting t2   ' )
+    info( '+++++++++++++ Setting t2   ' )
     "36 seconds later, link delay from switch to switch 1 will change to 200ms"
     "The whole procedure is analogous to the t1 case commented above"
-    #t2=Timer(36, cDelay2)
-    #t2.start()
-    #info( '+++++++++++++ t2 started\n' )
+    t2=Timer(36, cDelay2)
+    t2.start()
+    info( '+++++++++++++ t2 started\n' )
 
-    #info( '+++++++++++++ Setting t3   ' )
-    #t3=Timer(54, cDelay3)
-    #t3.start()
-    #info( '+++++++++++++ t3 started\n' )
+    info( '+++++++++++++ Setting t3   ' )
+    t3=Timer(54, cDelay3)
+    t3.start()
+    info( '+++++++++++++ t3 started\n' )
 
     info( "\n*** Running the test\n\n" )
 
