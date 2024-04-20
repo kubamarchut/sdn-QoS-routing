@@ -145,38 +145,43 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     def cDelay1(): #function called back to set the link delay to 50 ms; both directions have to be set
        #switch.cmdPrint('ethtool -K s0-eth1 gro off') #not supported by VBox, use the tc tool as below
        switch1.cmdPrint('tc qdisc del dev s1-eth1 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth1 root handle 10: netem delay 50ms')  #originally 50ms
+       switch1.cmdPrint('tc qdisc add dev s1-eth1 root handle 10: netem delay 10ms')  #originally 200 ms
        #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 200 ms
 
+       switch1.cmdPrint('tc qdisc del dev s1-eth2 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth2 root handle 10: netem delay 200ms')  #originally 50 ms
        switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 50 ms
 
+       switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 50ms')  #originally 10 ms 
        switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 10 ms
 
-       switch5.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch5.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
-       info( '+++++++++++++ 50ms delay started\n' )
+       info( '+++++++++++++ First change started\n' )
 
     def cDelay2(): #function called back to set the link delay to 200ms
        #switch.cmdPrint('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
        switch1.cmdPrint('tc qdisc del dev s1-eth1 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth1 root handle 10: netem delay 200ms')  #originally 200ms
-       #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #ethtool works for GRO only on specific interfaces
+       switch1.cmdPrint('tc qdisc add dev s1-eth1 root handle 10: netem delay 50ms')  #originally 200 ms
+       #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
        switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 200 ms
 
+       switch1.cmdPrint('tc qdisc del dev s1-eth2 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth2 root handle 10: netem delay 10ms')  #originally 50 ms
        switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
 
+       switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 200ms')  #originally 10 ms 
        switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 10 ms
 
-       switch5.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch5.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
-       info( '+++++++++++++ 200ms delay started\n' )
+       info( '+++++++++++++ Second change started\n' )
+
 
     # From this moment, the network is going to route with the inter-switch link delay equal 10 ms (inintial value)
     # The two timers set below will set two another link delay values in the 15th and 30th second of the experiment.
