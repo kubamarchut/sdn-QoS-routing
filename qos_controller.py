@@ -62,6 +62,14 @@ def getTheTime():  #function to create a timestamp
   then +="]%s.%s.%s" % (hrs,mins,secs)
   return then
 
+def _timer_func ():
+  global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid,turn
+  core.openflow.getConnection(s1_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  core.openflow.getConnection(s2_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  core.openflow.getConnection(s3_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  core.openflow.getConnection(s4_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+
+
 def _handle_portstats_received (event):
   #Observe the handling of port statistics provided by this function.
 
@@ -454,6 +462,7 @@ def _handle_PacketIn(event):
 #As usually, launch() is the function called by POX to initialize the component (controller.py in our case) 
 #indicated by a parameter provided to pox.py 
 
+
 def launch ():
   global start_time
   # core is an instance of class POXCore (EventMixin) and it can register objects.
@@ -462,3 +471,6 @@ def launch ():
   core.openflow.addListenerByName("PortStatsReceived",_handle_portstats_received) # listen for port stats , https://noxrepo.github.io/pox-doc/html/#statistics-events
   core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp) # listen for the establishment of a new control channel with a switch, https://noxrepo.github.io/pox-doc/html/#connectionup
   core.openflow.addListenerByName("PacketIn",_handle_PacketIn) # listen for the reception of packet_in message from switch, https://noxrepo.github.io/pox-doc/html/#packetin
+
+  Timer(2, _timer_func, recurring=True)
+
