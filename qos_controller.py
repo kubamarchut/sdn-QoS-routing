@@ -64,10 +64,19 @@ def getTheTime():  #function to create a timestamp
 
 def _timer_func ():
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid,turn
+  global start_time, sent_time1, sent_time2, sent_time3, sent_time4
   core.openflow.getConnection(s1_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  sent_time1=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch1
+  print "=====> probe sent(s1): f=", f.timestamp, " after=", int(time.time()*1000*10 - start_time), " [??*ms]"
   core.openflow.getConnection(s2_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  sent_time2=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch2
+  print "=====> probe sent(s2): f=", f.timestamp, " after=", int(time.time()*1000*10 - start_time), " [??*ms]"
   core.openflow.getConnection(s3_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  sent_time3=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch3
+  print "=====> probe sent(s3): f=", f.timestamp, " after=", int(time.time()*1000*10 - start_time), " [??*ms]"
   core.openflow.getConnection(s4_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+  sent_time4=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch4
+  print "=====> probe sent(s4): f=", f.timestamp, " after=", int(time.time()*1000*10 - start_time), " [??*ms]"
 
 
 def _handle_portstats_received (event):
