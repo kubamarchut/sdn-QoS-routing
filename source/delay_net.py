@@ -52,39 +52,39 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     link12 = TCLink( switch5, h6, **linkopts0)
 
     "print link0.intf1, link0.intf2"
-    link1.intf1.setMAC("0:1:0:0:0:1") #h1-s1
+    link1.intf2.setMAC("0:1:0:0:0:1") #h1-s1
     link2.intf2.setMAC("0:1:0:0:0:2") #h2-s1
-    link3.intf3.setMAC("0:1:0:0:0:3") #h3-s1
+    link3.intf2.setMAC("0:1:0:0:0:3") #h3-s1
 
-    link4.intf4.setMAC("0:1:0:0:0:4") #s1-s2
-    link4.intf1.setMAC("0:2:0:0:0:1") #s2-s1
+    link4.intf1.setMAC("0:1:0:0:0:4") #s1-s2
+    link4.intf2.setMAC("0:2:0:0:0:1") #s2-s1
 
-    link5.intf5.setMAC("0:1:0:0:0:5") #s1-s3
-    link5.intf1.setMAC("0:3:0:0:0:1") #s3-s1
+    link5.intf1.setMAC("0:1:0:0:0:5") #s1-s3
+    link5.intf2.setMAC("0:3:0:0:0:1") #s3-s1
 
-    link6.intf6.setMAC("0:1:0:0:0:6") #s1-s4
-    link6.intf1.setMAC("0:4:0:0:0:1") #s4-s1
+    link6.intf1.setMAC("0:1:0:0:0:6") #s1-s4
+    link6.intf2.setMAC("0:4:0:0:0:1") #s4-s1
 
-    link7.intf2.setMAC("0:2:0:0:0:2") #s2-s5
-    link7.intf1.setMAC("0:5:0:0:0:1") #s5-s2
+    link7.intf1.setMAC("0:2:0:0:0:2") #s2-s5
+    link7.intf2.setMAC("0:5:0:0:0:1") #s5-s2
 
-    link8.intf2.setMAC("0:3:0:0:0:2") #s3-s5
+    link8.intf1.setMAC("0:3:0:0:0:2") #s3-s5
     link8.intf2.setMAC("0:5:0:0:0:2") #s5-s3
 
-    link9.intf2.setMAC("0:4:0:0:0:2") #s4-s5
-    link9.intf3.setMAC("0:5:0:0:0:3") #s5-s4
+    link9.intf1.setMAC("0:4:0:0:0:2") #s4-s5
+    link9.intf2.setMAC("0:5:0:0:0:3") #s5-s4
 
-    link10.intf4.setMAC("0:5:0:0:0:4") #s5-h4
-    link11.intf5.setMAC("0:5:0:0:0:5") #s5-h5
-    link12.intf6.setMAC("0:5:0:0:0:6") #s5-h6
+    link10.intf1.setMAC("0:5:0:0:0:4") #s5-h4
+    link11.intf1.setMAC("0:5:0:0:0:5") #s5-h5
+    link12.intf1.setMAC("0:5:0:0:0:6") #s5-h6
 
     info( "*** Configuring hosts\n" )
-    h1.setIP( '192.168.123.1/24' )
-    h2.setIP( '192.168.123.2/24' )
-    h3.setIP( '192.168.123.3/24' )
-    h4.setIP( '192.168.123.4/24' )
-    h5.setIP( '192.168.123.5/24' )
-    h6.setIP( '192.168.123.6/24' ) 
+    h1.setIP( '10.0.0.1/24' )
+    h2.setIP( '10.0.0.2/24' )
+    h3.setIP( '10.0.0.3/24' )
+    h4.setIP( '10.0.0.4/24' )
+    h5.setIP( '10.0.0.5/24' )
+    h6.setIP( '10.0.0.6/24' ) 
     h1.setMAC("1:1:1:1:1:1")
     h2.setMAC("2:2:2:2:2:2")
     h3.setMAC("3:3:3:3:3:3")
@@ -144,38 +144,38 @@ def myNet(cname='controller', cargs='-v ptcp:'):
 
     def cDelay1(): #function called back to set the link delay to 50 ms; both directions have to be set
        #switch.cmdPrint('ethtool -K s0-eth1 gro off') #not supported by VBox, use the tc tool as below
-       switch1.cmdPrint('tc qdisc del dev s0-eth1 root')
-       switch1.cmdPrint('tc qdisc add dev s0-eth1 root handle 10: netem delay 50ms')  #originally 50ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth1 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth1 root handle 10: netem delay 50ms')  #originally 50ms
        #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
-       switch2.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
 
-       switch3.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
 
-       switch4.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
 
-       switch5.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch5.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch5.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch5.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
        info( '+++++++++++++ 50ms delay started\n' )
 
     def cDelay2(): #function called back to set the link delay to 200ms
        #switch.cmdPrint('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
-       switch1.cmdPrint('tc qdisc del dev s0-eth1 root')
-       switch1.cmdPrint('tc qdisc add dev s0-eth1 root handle 10: netem delay 200ms')  #originally 200ms
+       switch1.cmdPrint('tc qdisc del dev s1-eth1 root')
+       switch1.cmdPrint('tc qdisc add dev s1-eth1 root handle 10: netem delay 200ms')  #originally 200ms
        #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #ethtool works for GRO only on specific interfaces
-       switch2.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
 
-       switch3.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
 
-       switch4.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
 
-       switch5.cmdPrint('tc qdisc del dev s1-eth0 root')
-       switch5.cmdPrint('tc qdisc add dev s1-eth0 root handle 10: netem delay 200ms') #originally 200ms
+       switch5.cmdPrint('tc qdisc del dev s2-eth0 root')
+       switch5.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200ms
        info( '+++++++++++++ 200ms delay started\n' )
 
     # From this moment, the network is going to route with the inter-switch link delay equal 10 ms (inintial value)
@@ -203,7 +203,7 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     " All values (includig -c 51 in the ping command) have been tuned to provide an equal"
     " number of 15 ICMP echoes in each iteration."
     " Note also h0-to-h1 ping delay (RTT) will include delays h0-switch and switch1-h1"
-    switch1.cmdPrint( 'ping -i 1 -c 51 ' + switch2.IP() )
+    h1.cmdPrint( 'ping -i 1 -c 51 ' + h4.IP() )
 
     sleep( 1 )
     info( "*** Stopping the network\n" )
