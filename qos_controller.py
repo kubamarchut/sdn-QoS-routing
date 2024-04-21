@@ -48,10 +48,10 @@ OWD2=0.0
 links = {
   "s1-s2": {
     "delay": float("inf"),
-  }
+  },
   "s1-s3": {
     "delay": float("inf"),
-  }
+  },
   "s1-s4": {
     "delay": float("inf"),
   }
@@ -225,16 +225,16 @@ def _handle_ConnectionUp (event):
     Timer(1, _timer_func, recurring=True)
 
 def calculate_delay(received_time, d, OWD1, OWD2, link_name):
-    global delay
+    global links
     delay_c = int((received_time - d - OWD1 - OWD2) / 10)
-    delay[link_name].delay = delay_c
+    links[link_name].delay = delay_c
 
 flag = 0
 
 def _handle_PacketIn(event):
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
   
-  global start_time, OWD1, OWD2, delay, flag
+  global start_time, OWD1, OWD2, links, flag
 
   received_time = time.time() * 1000*10 - start_time #amount of time elapsed from start_time
 
@@ -254,7 +254,7 @@ def _handle_PacketIn(event):
       calculate_delay(received_time, d, OWD1, OWD2, "s1-s4")
 
     if flag%3 == 0:
-      sorted_delays = sorted(delay.items())
+      sorted_delays = sorted(links.items())
       print "delay " + ' | '.join("{}: {:<3} [ms]".format(link_name, delay_value) for link_name, delay_value.delay in sorted_delays)  
   
   #print "_handle_PacketIn is called, packet.type:", packet.type, " event.connection.dpid:", event.connection.dpid
