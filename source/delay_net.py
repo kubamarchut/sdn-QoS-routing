@@ -247,22 +247,22 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     " All values (includig -c 51 in the ping command) have been tuned to provide an equal"
     " number of 15 ICMP echoes in each iteration."
     " Note also h0-to-h1 ping delay (RTT) will include delays h0-switch and switch1-h1"
-    h1.cmdPrint( 'ping -i 1 -c 70 ' + h4.IP() )
+    #h1.cmdPrint( 'ping -i 1 -c 70 ' + h4.IP() )
 
-    sleep( 1 )
-    info( "*** Stopping the network\n" )
-    controller.cmd( 'kill %' + cname )
-    switch1.cmd( 'ovs-vsctl del-br dp1' )
-    switch1.deleteIntfs()
-    switch2.cmd( 'ovs-vsctl del-br dp2' )
-    switch2.deleteIntfs()
-    switch3.cmd( 'ovs-vsctl del-br dp3' )
-    switch3.deleteIntfs()
-    switch4.cmd( 'ovs-vsctl del-br dp4' )
-    switch4.deleteIntfs()
-    switch5.cmd( 'ovs-vsctl del-br dp5' )
-    switch5.deleteIntfs()
-    info( '\n' )
+    #sleep( 1 )
+    #info( "*** Stopping the network\n" )
+    #controller.cmd( 'kill %' + cname )
+    #switch1.cmd( 'ovs-vsctl del-br dp1' )
+    #switch1.deleteIntfs()
+    #switch2.cmd( 'ovs-vsctl del-br dp2' )
+    #switch2.deleteIntfs()
+    #switch3.cmd( 'ovs-vsctl del-br dp3' )
+    #switch3.deleteIntfs()
+    #switch4.cmd( 'ovs-vsctl del-br dp4' )
+    #switch4.deleteIntfs()
+    #switch5.cmd( 'ovs-vsctl del-br dp5' )
+    #switch5.deleteIntfs()
+    #info( '\n' )
 
 if __name__ == '__main__':
     setLogLevel( 'info' )
