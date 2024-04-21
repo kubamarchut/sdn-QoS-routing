@@ -149,7 +149,7 @@ def _handle_portstats_received (event):
            pre_s2_p1=s2_p1
            s2_p1=f.rx_packets
            #s2_p1=f.rx_bytes
-     print getTheTime(), "s1_p4(Sent):", (s1_p4-pre_s1_p4), "s2_p1(Received):", (s2_p1-pre_s2_p1)
+     #print getTheTime(), "s1_p4(Sent):", (s1_p4-pre_s1_p4), "s2_p1(Received):", (s2_p1-pre_s2_p1)
  
   if event.connection.dpid==s3_dpid:
      for f in event.stats:
@@ -157,7 +157,7 @@ def _handle_portstats_received (event):
          if f.port_no==1:
            pre_s3_p1=s3_p1
            s3_p1=f.rx_packets
-     print getTheTime(), "s1_p5(Sent):", (s1_p5-pre_s1_p5), "s3_p1(Received):", (s3_p1-pre_s3_p1)
+     #print getTheTime(), "s1_p5(Sent):", (s1_p5-pre_s1_p5), "s3_p1(Received):", (s3_p1-pre_s3_p1)
 
   if event.connection.dpid==s4_dpid:
      for f in event.stats:
@@ -165,7 +165,7 @@ def _handle_portstats_received (event):
          if f.port_no==1:
            pre_s4_p1=s4_p1
            s4_p1=f.rx_packets
-     print getTheTime(), "s1_p6(Sent):", (s1_p6-pre_s1_p6), "s4_p1(Received):", (s4_p1-pre_s4_p1)
+     #print getTheTime(), "s1_p6(Sent):", (s1_p6-pre_s1_p6), "s4_p1(Received):", (s4_p1-pre_s4_p1)
 
 def _handle_ConnectionUp (event):
   # waits for connections from all switches, after connecting to all of them it starts a round robin timer for triggering h1-h4 routing changes

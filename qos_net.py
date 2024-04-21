@@ -35,10 +35,10 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     "Initial link settings, initial delay of link switch-switch2 set to 10 ms"
     "host link delays set to 1ms"
     info( "*** Creating links\n" )
-    linkopts0=dict(bw=100, delay='0ms', loss=0)
-    linkopts1=dict(bw=100, delay='200ms', loss=0)
-    linkopts2=dict(bw=100, delay='50ms', loss=0)
-    linkopts3=dict(bw=100, delay='10ms', loss=0)
+    linkopts0=dict(bw=1000, delay='0ms', loss=0)
+    linkopts1=dict(bw=1000, delay='200ms', loss=0)
+    linkopts2=dict(bw=1000, delay='50ms', loss=0)
+    linkopts3=dict(bw=1000, delay='10ms', loss=0)
     link1 = TCLink( h1, switch1, **linkopts0)
     link2 = TCLink( h2, switch1, **linkopts0)
     link3 = TCLink( h3, switch1, **linkopts0)

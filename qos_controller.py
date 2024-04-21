@@ -15,7 +15,9 @@ from pox.lib.packet.packet_base import packet_base
 from pox.lib.packet.packet_utils import *
 import pox.lib.packet as pkt
 from pox.lib.recoco import Timer
+
 import time
+import json
  
 log = core.getLogger()
  
@@ -230,6 +232,18 @@ def calculate_delay(received_time, d, OWD1, OWD2, link_name):
     links[link_name].delay = delay_c
 
 flag = 0
+
+def setPath(dpid, dstIP, port):
+  if dpid<>0:
+    msg = of.ofp_flow_mod()
+    msg.command=of.OFPFC_MODIFY_STRICT
+    msg.priority = 100
+    msg.idle_timeout = 0
+    msg.hard_timeout = 0
+    msg.match.dl_type = 0x0800
+    msg.match.nw_dst = str(dstIP)
+    msg.actions.append(of.ofp_action_output(port = port+2))
+    core.openflow.getConnection(dpid).send(msg)
 
 def _handle_PacketIn(event):
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
@@ -566,11 +580,61 @@ def _handle_PacketIn(event):
 #As usually, launch() is the function called by POX to initialize the component (controller.py in our case) 
 #indicated by a parameter provided to pox.py 
 
+def read_req_conn(file_path):
+  try:
+      with open(file_path, 'r') as file:
+          data = json.load(file)
+          return data.get('connections', [])
+  except IOError:
+      print "Error: File '%s' not found." % file_path
+      return []
+
+req_conn = []
+MAX_CONNECTIONS_PER_LINK = 3
+
+def find_matching_link():
+  global links, req_conn, s1_dpid, s5_dpid
+
+  sorted_links = sorted(links.values(), key=lambda link: link.delay, reverse=True)
+  for link in sorted_links: 
+    link.connection = 0
+
+  for node in req_conn:
+    path_str = "setting path for: " + node["src"] + " " + node["dst"]
+    matching_path_found = False
+    for link in sorted_links:
+      if node["min_delay"] > (link.delay * 1.2) and link.connection < MAX_CONNECTIONS_PER_LINK:
+        matching_path_found = True
+        link.connection += 1
+        print path_str, link.delay, link.name,
+        print link.name.split("-")[1]
+        link_port = int(link.name.split("-")[1][1:])
+        dstIP = "10.0.0." + node["dst"][1:]
+        srcIP = "10.0.0." + node["src"][1:]
+        link_port = 4
+        setPath(s1_dpid, dstIP, link_port)
+        setPath(s5_dpid, srcIP, link_port-3)
+
+
+        break
+    if not matching_path_found:
+      print "No matching path found for:", node["src"], node["dst"]
+
+    
 
 def launch ():
-  global start_time
+  global start_time, req_conn
   start_time = time.time() * 1000*10 # factor *10 applied to increase the accuracy for short delays (capture tenths of ms)
-  print "nie start:", start_time/10
+  print "start:", start_time/10
+
+  conn_req_path = "/home/student/Desktop/projekt/conn_req_parralel.json"
+  print "loading requested connections data from file", conn_req_path
+
+  req_conn = read_req_conn(conn_req_path)
+  print "Requested connections:"
+  Timer(1, find_matching_link, recurring=True)
+  for node in req_conn:
+    print "\t",node
 
   # core is an instance of class POXCore (EventMixin) and it can register objects.
   # An object with name xxx can be registered to core instance which makes this object become a "component" available as pox.core.core.xxx.
@@ -578,4 +642,6 @@ def launch ():
   core.openflow.addListenerByName("PortStatsReceived",_handle_portstats_received) # listen for port stats , https://noxrepo.github.io/pox-doc/html/#statistics-events
   core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp) # listen for the establishment of a new control channel with a switch, https://noxrepo.github.io/pox-doc/html/#connectionup
   core.openflow.addListenerByName("PacketIn",_handle_PacketIn) # listen for the reception of packet_in message from switch, https://noxrepo.github.io/pox-doc/html/#packetin
+  
 
+  

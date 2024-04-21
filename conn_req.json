@@ -1,0 +1,9 @@
+{
+    "connections": [
+      {
+        "src": "h1",
+        "dst": "h4",
+        "min_delay": 100
+      }
+    ]
+  }
