@@ -154,10 +154,10 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     info( '\n' )
 
     def cDelay1(): #function called back to set the link delay to 50 ms; both directions have to be set
-       #switch.cmdPrint('ethtool -K s0-eth1 gro off') #not supported by VBox, use the tc tool as below
+       #switch.cmd('ethtool -K s0-eth1 gro off') #not supported by VBox, use the tc tool as below
        switch1.cmd('tc qdisc del dev s1-eth3 root')
        switch1.cmd('tc qdisc add dev s1-eth3 root handle 10: netem delay 10ms')  #originally 200 ms
-       #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
+       #switch1.cmd('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
        switch2.cmd('tc qdisc del dev s2-eth0 root')
        switch2.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 200 ms
 
@@ -174,42 +174,42 @@ def myNet(cname='controller', cargs='-v ptcp:'):
        info( '+++++++++++++ First change started\n' )
 
     def cDelay2(): #function called back to set the link delay to 200ms
-       #switch.cmdPrint('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
-       switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 50ms')  #originally 200 ms
-       #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
-       switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 200 ms
+       #switch.cmd('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
+       switch1.cmd('tc qdisc del dev s1-eth3 root')
+       switch1.cmd('tc qdisc add dev s1-eth3 root handle 10: netem delay 50ms')  #originally 200 ms
+       #switch1.cmd('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
+       switch2.cmd('tc qdisc del dev s2-eth0 root')
+       switch2.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 200 ms
 
-       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 10ms')  #originally 50 ms
-       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
+       switch1.cmd('tc qdisc del dev s1-eth4 root')
+       switch1.cmd('tc qdisc add dev s1-eth4 root handle 10: netem delay 10ms')  #originally 50 ms
+       switch3.cmd('tc qdisc del dev s2-eth0 root')
+       switch3.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 50 ms
 
-       switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 200ms')  #originally 10 ms 
-       switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 10 ms
+       switch1.cmd('tc qdisc del dev s1-eth5 root')
+       switch1.cmd('tc qdisc add dev s1-eth5 root handle 10: netem delay 200ms')  #originally 10 ms 
+       switch4.cmd('tc qdisc del dev s2-eth0 root')
+       switch4.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 10 ms
 
        info( '+++++++++++++ Second change started\n' )
 
     def cDelay3(): #function called back to set the link delay to 200ms
-       #switch.cmdPrint('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
-       switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 200ms')  #originally 200 ms
-       #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
-       switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200 ms
+       #switch.cmd('ethtool -K s0-eth1 gro off')  #ethtool works for GRO only on specific interfaces
+       switch1.cmd('tc qdisc del dev s1-eth3 root')
+       switch1.cmd('tc qdisc add dev s1-eth3 root handle 10: netem delay 200ms')  #originally 200 ms
+       #switch1.cmd('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
+       switch2.cmd('tc qdisc del dev s2-eth0 root')
+       switch2.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 200ms') #originally 200 ms
 
-       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 50ms')  #originally 50 ms
-       switch3.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
+       switch1.cmd('tc qdisc del dev s1-eth4 root')
+       switch1.cmd('tc qdisc add dev s1-eth4 root handle 10: netem delay 50ms')  #originally 50 ms
+       switch3.cmd('tc qdisc del dev s2-eth0 root')
+       switch3.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 50ms') #originally 50 ms
 
-       switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 10ms')  #originally 10 ms 
-       switch4.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 10 ms
+       switch1.cmd('tc qdisc del dev s1-eth5 root')
+       switch1.cmd('tc qdisc add dev s1-eth5 root handle 10: netem delay 10ms')  #originally 10 ms 
+       switch4.cmd('tc qdisc del dev s2-eth0 root')
+       switch4.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 10 ms
 
        info( '+++++++++++++ Third change started\n' )
 
@@ -277,27 +277,27 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     #info( '\n' )
 
     def start_ping():
-    while True:
-        try:
-            src = input("Enter source host: ")
-            dest = input("Enter destination host: ")
-            src_host = globals()[src]
-            dest_host = globals()[dest]
-            info("*** Pinging between {} and {}\n".format(src, dest))
-            result = src_host.cmd('ping -c 15 ' + dest_host.IP())
-            print(result)
-        except KeyError as e:
-            print("Error: Host not found. Please enter valid host names.")
-        except Exception as e:
-            print("Error:", e)
-        try:
-            again = input("Do you want to ping again? (y/n): ").strip().lower()
-            if again != 'y':
+        while True:
+            try:
+                src = input("Enter source host: ")
+                dest = input("Enter destination host: ")
+                src_host = globals()[src]
+                dest_host = globals()[dest]
+                info("*** Pinging between {} and {}\n".format(src, dest))
+                result = src_host.cmd('ping -c 15 ' + dest_host.IP())
+                print(result)
+            except KeyError as e:
+                print("Error: Host not found. Please enter valid host names.")
+            except Exception as e:
+                print("Error:", e)
+            try:
+                again = input("Do you want to ping again? (y/n): ").strip().lower()
+                if again != 'y':
+                    break
+            except KeyboardInterrupt:
                 break
-        except KeyboardInterrupt:
-            break
 
-    start_ping()
+    #start_ping()
 
 if __name__ == '__main__':
     setLogLevel( 'info' )
