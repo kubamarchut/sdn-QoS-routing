@@ -249,7 +249,7 @@ def _handle_PacketIn(event):
 
     if flag%3 == 0:
       sorted_delays = sorted(delay.items())
-      print "delay " + ' '.join("{}: {:<3} [ms] |".format(link_name, delay_value) for link_name, delay_value in sorted_delays)  
+      print "delay " + ' | '.join("{}: {:<3} [ms]".format(link_name, delay_value) for link_name, delay_value in sorted_delays)  
   
   #print "_handle_PacketIn is called, packet.type:", packet.type, " event.connection.dpid:", event.connection.dpid
 
@@ -564,7 +564,7 @@ def _handle_PacketIn(event):
 def launch ():
   global start_time
   start_time = time.time() * 1000*10 # factor *10 applied to increase the accuracy for short delays (capture tenths of ms)
-  print "start_time:", start_time/10
+  print "nie start:", start_time/10
 
   # core is an instance of class POXCore (EventMixin) and it can register objects.
   # An object with name xxx can be registered to core instance which makes this object become a "component" available as pox.core.core.xxx.

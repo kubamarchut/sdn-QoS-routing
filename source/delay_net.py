@@ -13,6 +13,7 @@ from mininet.link import TCLink
 from mininet.log import  setLogLevel, info
 from threading import Timer
 from mininet.util import quietRun
+from mininet.cli import CLI
 from time import sleep
 
 def myNet(cname='controller', cargs='-v ptcp:'):
@@ -34,7 +35,7 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     "Initial link settings, initial delay of link switch-switch2 set to 10 ms"
     "host link delays set to 1ms"
     info( "*** Creating links\n" )
-    linkopts0=dict(bw=100, delay='1ms', loss=0)
+    linkopts0=dict(bw=100, delay='0ms', loss=0)
     linkopts1=dict(bw=100, delay='200ms', loss=0)
     linkopts2=dict(bw=100, delay='50ms', loss=0)
     linkopts3=dict(bw=100, delay='10ms', loss=0)
@@ -85,6 +86,16 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     h4.setIP( '10.0.0.4/24' )
     h5.setIP( '10.0.0.5/24' )
     h6.setIP( '10.0.0.6/24' ) 
+    h1_cmd = "xterm -hold -e 'bash -c \"echo Host1; hostname; bash\"'"
+    h2_cmd = "xterm -hold -e 'bash -c \"echo Host2; hostname; bash\"'"
+    h3_cmd = "xterm -hold -e 'bash -c \"echo Host3; hostname; bash\"'"
+    
+    h1.cmd(h1_cmd + " &")
+    h2.cmd(h2_cmd + " &")
+    h3.cmd(h3_cmd + " &")
+    #h4.cmd("xterm")
+    #h5.cmd("xterm")
+    #h6.cmd("xterm")
     h1.setMAC("1:1:1:1:1:1")
     h2.setMAC("2:2:2:2:2:2")
     h3.setMAC("3:3:3:3:3:3")
@@ -144,21 +155,21 @@ def myNet(cname='controller', cargs='-v ptcp:'):
 
     def cDelay1(): #function called back to set the link delay to 50 ms; both directions have to be set
        #switch.cmdPrint('ethtool -K s0-eth1 gro off') #not supported by VBox, use the tc tool as below
-       switch1.cmdPrint('tc qdisc del dev s1-eth3 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth3 root handle 10: netem delay 10ms')  #originally 200 ms
+       switch1.cmd('tc qdisc del dev s1-eth3 root')
+       switch1.cmd('tc qdisc add dev s1-eth3 root handle 10: netem delay 10ms')  #originally 200 ms
        #switch1.cmdPrint('ethtool -K s1-eth0 gro off') #not supported by VBox, use the tc tool as below
-       switch2.cmdPrint('tc qdisc del dev s2-eth0 root')
-       switch2.cmdPrint('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 200 ms
+       switch2.cmd('tc qdisc del dev s2-eth0 root')
+       switch2.cmd('tc qdisc add dev s2-eth0 root handle 10: netem delay 10ms') #originally 200 ms
 
-       switch1.cmdPrint('tc qdisc del dev s1-eth4 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth4 root handle 10: netem delay 200ms')  #originally 50 ms
-       switch3.cmdPrint('tc qdisc del dev s3-eth0 root')
-       switch3.cmdPrint('tc qdisc add dev s3-eth0 root handle 10: netem delay 200ms') #originally 50 ms
+       switch1.cmd('tc qdisc del dev s1-eth4 root')
+       switch1.cmd('tc qdisc add dev s1-eth4 root handle 10: netem delay 200ms')  #originally 50 ms
+       switch3.cmd('tc qdisc del dev s3-eth0 root')
+       switch3.cmd('tc qdisc add dev s3-eth0 root handle 10: netem delay 200ms') #originally 50 ms
 
-       switch1.cmdPrint('tc qdisc del dev s1-eth5 root')
-       switch1.cmdPrint('tc qdisc add dev s1-eth5 root handle 10: netem delay 50ms')  #originally 10 ms 
-       switch4.cmdPrint('tc qdisc del dev s4-eth0 root')
-       switch4.cmdPrint('tc qdisc add dev s4-eth0 root handle 10: netem delay 50ms') #originally 10 ms
+       switch1.cmd('tc qdisc del dev s1-eth5 root')
+       switch1.cmd('tc qdisc add dev s1-eth5 root handle 10: netem delay 50ms')  #originally 10 ms 
+       switch4.cmd('tc qdisc del dev s4-eth0 root')
+       switch4.cmd('tc qdisc add dev s4-eth0 root handle 10: netem delay 50ms') #originally 10 ms
 
        info( '+++++++++++++ First change started\n' )
 
@@ -212,35 +223,36 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     switch3.cmdPrint('ip a')
     switch4.cmdPrint('ip a')
     switch5.cmdPrint('ip a')
+    
+    interval = 30
+    def updateDelays():
+        cDelay1()
+        Timer(interval, cDelay2).start()
+        Timer(2*interval, cDelay3).start()
+        Timer(3*interval, updateDelays).start()
 
-    #def updateDelays():
-    #    cDelay1()
-    #    Timer(15, cDelay2).start()
-    #    Timer(30, cDelay3).start()
-    #    Timer(45, updateDelays).start()
-
-    #updateDelays()
+    updateDelays()
 
     info( '+++++++++++++ Setting t1   ' )
     "Timer t1 is set to trigger function cDelay1 after the period of 21 sec which will set link delay to 200ms"
     "When t1 expires, cDelay1 is triggered and link delay is set to 50ms"
-    t1=Timer(5, cDelay1)
-    t1.start()
-    info( '+++++++++++++ t1 started\n' )
+    #t1=Timer(5, cDelay1)
+    #t1.start()
+    #info( '+++++++++++++ t1 started\n' )
 
-    info( '+++++++++++++ Setting t2   ' )
-    "36 seconds later, link delay from switch to switch 1 will change to 200ms"
-    "The whole procedure is analogous to the t1 case commented above"
-    t2=Timer(10, cDelay2)
-    t2.start()
-    info( '+++++++++++++ t2 started\n' )
+    #info( '+++++++++++++ Setting t2   ' )
+    #"36 seconds later, link delay from switch to switch 1 will change to 200ms"
+    #"The whole procedure is analogous to the t1 case commented above"
+    #t2=Timer(10, cDelay2)
+    #t2.start()
+    #info( '+++++++++++++ t2 started\n' )
 
-    info( '+++++++++++++ Setting t3   ' )
-    t3=Timer(15, cDelay3)
-    t3.start()
-    info( '+++++++++++++ t3 started\n' )
+    #info( '+++++++++++++ Setting t3   ' )
+    #t3=Timer(15, cDelay3)
+    #t3.start()
+    #info( '+++++++++++++ t3 started\n' )
 
-    info( "\n*** Running the test\n\n" )
+    #info( "\n*** Running the test\n\n" )
 
     # Generate 45 ICMP echo requests, one per second, which accounts to 45 seconds
     " The script will stay in this ping phase for 51 seconds only being interrupted by t1 and t2."
