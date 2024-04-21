@@ -45,16 +45,16 @@ start_time=0
 OWD1=0.0
 OWD2=0.0
 
+class Link:
+  def __init__(self, name, delay=float("inf")):
+    self.name = name
+    self.delay = delay
+    self.connections = 0
+
 links = {
-  "s1-s2": {
-    "delay": float("inf"),
-  },
-  "s1-s3": {
-    "delay": float("inf"),
-  },
-  "s1-s4": {
-    "delay": float("inf"),
-  }
+  "s1-s2": Link("s1-s2"),
+  "s1-s3": Link("s1-s3"),
+  "s1-s4": Link("s1-s4"),
 }
 
 #probe protocol packet definition; only timestamp field is present in the header (no payload part)
@@ -255,7 +255,7 @@ def _handle_PacketIn(event):
 
     if flag%3 == 0:
       sorted_delays = sorted(links.items())
-      print "delay " + ' | '.join("{}: {:<3} [ms]".format(link_name, delay_value) for link_name, delay_value.delay in sorted_delays)  
+      print "delay " + ' | '.join("{}: {:<3} [ms]".format(link_name, delay_value.delay) for link_name, delay_value in sorted_delays)  
   
   #print "_handle_PacketIn is called, packet.type:", packet.type, " event.connection.dpid:", event.connection.dpid
 
