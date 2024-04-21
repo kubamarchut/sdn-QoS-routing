@@ -45,10 +45,16 @@ start_time=0
 OWD1=0.0
 OWD2=0.0
 
-delay = {
-  "s1-s2": float("inf"),
-  "s1-s3": float("inf"),
-  "s1-s4": float("inf"),
+links = {
+  "s1-s2": {
+    "delay": float("inf"),
+  }
+  "s1-s3": {
+    "delay": float("inf"),
+  }
+  "s1-s4": {
+    "delay": float("inf"),
+  }
 }
 
 #probe protocol packet definition; only timestamp field is present in the header (no payload part)
@@ -221,7 +227,7 @@ def _handle_ConnectionUp (event):
 def calculate_delay(received_time, d, OWD1, OWD2, link_name):
     global delay
     delay_c = int((received_time - d - OWD1 - OWD2) / 10)
-    delay[link_name] = delay_c
+    delay[link_name].delay = delay_c
 
 flag = 0
 
@@ -249,7 +255,7 @@ def _handle_PacketIn(event):
 
     if flag%3 == 0:
       sorted_delays = sorted(delay.items())
-      print "delay " + ' | '.join("{}: {:<3} [ms]".format(link_name, delay_value) for link_name, delay_value in sorted_delays)  
+      print "delay " + ' | '.join("{}: {:<3} [ms]".format(link_name, delay_value) for link_name, delay_value.delay in sorted_delays)  
   
   #print "_handle_PacketIn is called, packet.type:", packet.type, " event.connection.dpid:", event.connection.dpid
 
