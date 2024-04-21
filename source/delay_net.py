@@ -264,6 +264,29 @@ def myNet(cname='controller', cargs='-v ptcp:'):
     #switch5.deleteIntfs()
     #info( '\n' )
 
+    def start_ping():
+    while True:
+        try:
+            src = input("Enter source host: ")
+            dest = input("Enter destination host: ")
+            src_host = globals()[src]
+            dest_host = globals()[dest]
+            info("*** Pinging between {} and {}\n".format(src, dest))
+            result = src_host.cmd('ping -c 15 ' + dest_host.IP())
+            print(result)
+        except KeyError as e:
+            print("Error: Host not found. Please enter valid host names.")
+        except Exception as e:
+            print("Error:", e)
+        try:
+            again = input("Do you want to ping again? (y/n): ").strip().lower()
+            if again != 'y':
+                break
+        except KeyboardInterrupt:
+            break
+
+    start_ping()
+
 if __name__ == '__main__':
     setLogLevel( 'info' )
     info( '*** Scratch network demo (kernel datapath)\n' )
