@@ -46,6 +46,15 @@ pre_s4_p1=0
 start_time=0
 OWD1=0.0
 OWD2=0.0
+OWD3=0.0
+OWD4=0.0
+
+sent_time1 = 0
+sent_time2 = 0
+sent_time3 = 0
+sent_time4 = 0
+sent_time5 = 0
+sent_time6 = 0
 
 class Link:
   def __init__(self, name, delay=float("inf")):
@@ -98,7 +107,7 @@ def getTheTime():  #function to create a timestamp
   return then
 
 def measure_delay(src_dpid, dst_dpid, src_mac, dst_mac, port):
-  global start_time, sent_time1, sent_time2
+  global start_time
   if src_dpid <>0 and not core.openflow.getConnection(src_dpid) is None:
     #send out port_stats_request packet through switch0 connection src_dpid (to measure T1)
     core.openflow.getConnection(src_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
@@ -127,13 +136,15 @@ def measure_delay(src_dpid, dst_dpid, src_mac, dst_mac, port):
     sent_time2=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch1
     #print "sent_time2:", sent_time2
 
+  return sent_time1, sent_time2
+
 def _timer_func ():
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
-  global start_time, sent_time1, sent_time2, sent_time3, sent_time4
+  global start_time, sent_time1, sent_time2, sent_time3, sent_time4, sent_time5, sent_time6
   
-  measure_delay(s1_dpid, s2_dpid, "0:1:0:0:0:4", "0:2:0:0:0:1", 4)
-  measure_delay(s1_dpid, s3_dpid, "0:1:0:0:0:5", "0:3:0:0:0:1", 5)
-  measure_delay(s1_dpid, s4_dpid, "0:1:0:0:0:6", "0:4:0:0:0:1", 6)
+  sent_time1, sent_time2 = measure_delay(s1_dpid, s2_dpid, "0:1:0:0:0:4", "0:2:0:0:0:1", 4)
+  sent_time3, sent_time4 = measure_delay(s1_dpid, s3_dpid, "0:1:0:0:0:5", "0:3:0:0:0:1", 5)
+  sent_time5, sent_time6 = measure_delay(s1_dpid, s4_dpid, "0:1:0:0:0:6", "0:4:0:0:0:1", 6)
   
 
 def _handle_portstats_received (event):
@@ -142,6 +153,7 @@ def _handle_portstats_received (event):
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
   global s1_p1,s1_p4, s1_p5, s1_p6, s2_p1, s3_p1, s4_p1
   global pre_s1_p1,pre_s1_p4, pre_s1_p5, pre_s1_p6, pre_s2_p1, pre_s3_p1, pre_s4_p1
+  global OWD1, OWD2, OWD3, OWD4
 
   received_time = time.time() * 1000*10 - start_time
   #measure T1 as of lab guide
@@ -153,6 +165,12 @@ def _handle_portstats_received (event):
   elif event.connection.dpid == s2_dpid:
     OWD2=0.5*(received_time - sent_time2) #originally sent_time1 was here
     #print "OWD2: ", OWD2, "ms"
+  
+  elif event.connection.dpid == s3_dpid:
+    OWD3=0.5*(received_time - sent_time4)
+  
+  elif event.connection.dpid == s4_dpid:
+    OWD4=0.5*(received_time - sent_time6)
 
   if event.connection.dpid==s1_dpid: # The DPID of one of the switches involved in the link
     for f in event.stats:
@@ -263,9 +281,9 @@ def _handle_PacketIn(event):
     if event.connection.dpid == s2_dpid:
       calculate_delay(received_time, d, OWD1, OWD2, "s1-s2")
     elif event.connection.dpid == s3_dpid:
-      calculate_delay(received_time, d, OWD1, OWD2, "s1-s3")
+      calculate_delay(received_time, d, OWD1, OWD3, "s1-s3")
     elif event.connection.dpid == s4_dpid:
-      calculate_delay(received_time, d, OWD1, OWD2, "s1-s4")
+      calculate_delay(received_time, d, OWD1, OWD4, "s1-s4")
 
     if flag%3 == 0:
       sorted_delays = sorted(links.items())
@@ -599,27 +617,32 @@ def find_matching_link():
   for link in sorted_links: 
     link.connection = 0
 
+  print "path for:",
+  paths = []
+  links_choosen = []
   for node in req_conn:
-    path_str = "setting path for: " + node["src"] + " " + node["dst"]
+    paths.append(node["src"] + "<->" + node["dst"])
     matching_path_found = False
     for link in sorted_links:
       if node["min_delay"] > (link.delay * 1.2) and link.connection < MAX_CONNECTIONS_PER_LINK:
         matching_path_found = True
         link.connection += 1
-        print path_str, link.delay, link.name,
-        print link.name.split("-")[1]
+        links_choosen.append(link.name)
         link_port = int(link.name.split("-")[1][1:])
         dstIP = "10.0.0." + node["dst"][1:]
         srcIP = "10.0.0." + node["src"][1:]
-        link_port = 4
         setPath(s1_dpid, dstIP, link_port)
         setPath(s5_dpid, srcIP, link_port-3)
 
 
         break
     if not matching_path_found:
-      print "No matching path found for:", node["src"], node["dst"]
+      links_choosen.append("None")
 
+  for path, link in zip(paths, links_choosen):
+    print path, link + " | ",
+  
+  print ""
     
 
 def launch ():
