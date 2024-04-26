@@ -2,8 +2,8 @@
 # The switches are connected in a diamond topology (without vertical links):
 #    - 3 hosts are connected to the left (s1) and 3 to the right (s5) edge of the diamond.
 # Overall operation of the controller:
-#    - default routing is set in all switches on the reception of packet_in messages form the switch,
-#    - then the routing between each host pair is set based on QoS rules
+#    - based on requested, in json file connections, rules are set on switches
+#    - then the routing between each requested host pair is set based on QoS rules
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
@@ -26,19 +26,11 @@ s2_dpid=0
 s3_dpid=0
 s4_dpid=0
 s5_dpid=0
- 
-s1_p1=0
-s1_p4=0
-s1_p5=0
-s1_p6=0
+
 s2_p1=0
 s3_p1=0
 s4_p1=0
  
-pre_s1_p1=0
-pre_s1_p4=0
-pre_s1_p5=0
-pre_s1_p6=0
 pre_s2_p1=0
 pre_s3_p1=0
 pre_s4_p1=0
@@ -72,15 +64,15 @@ links = {
   "s1-s4": Link("s1-s4"),
 }
 
-#probe protocol packet definition; only timestamp field is present in the header (no payload part)
+# probe protocol packet definition; only timestamp field is present in the header (no payload part)
 class myproto(packet_base):
-  #My Protocol packet struct
+  # My Protocol packet struct
   """
   myproto class defines our special type of packet to be sent all the way along including the link between the switches to measure link delays;
   it adds member attribute named timestamp to carry packet creation/sending time by the controller, and defines the 
   function hdr() to return the header of measurement packet (header will contain timestamp)
   """
-  #For more info on packet_base class refer to file pox/lib/packet/packet_base.py
+  # For more info on packet_base class refer to file pox/lib/packet/packet_base.py
 
   def __init__(self):
      packet_base.__init__(self)
@@ -89,7 +81,8 @@ class myproto(packet_base):
   def hdr(self, payload):
      return struct.pack('!I', self.timestamp) # code as unsigned int (I), network byte order (!, big-endian - the most significant byte of a word at the smallest memory address)
 
-def getTheTime():  #function to create a timestamp
+def getTheTime():
+  # function to create a timestamp
   flock = time.localtime()
   then = "[%s-%s-%s" %(str(flock.tm_year),str(flock.tm_mon),str(flock.tm_mday))
  
@@ -113,32 +106,32 @@ def getTheTime():  #function to create a timestamp
 def measure_delay(src_dpid, dst_dpid, src_mac, dst_mac, port):
   global start_time
   if src_dpid <>0 and not core.openflow.getConnection(src_dpid) is None:
-    #send out port_stats_request packet through switch0 connection src_dpid (to measure T1)
+    # send out port_stats_request packet through switch with src_pid connection (to measure T1)
     core.openflow.getConnection(src_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
-    sent_time1=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch0
-    #print "sent_time1:", sent_time1
+    sent_time1=time.time() * 1000*10 - start_time # sending time of stats_req: ctrl => switch1
+    # print "sent_time1:", sent_time1
 
-    #sequence of packet formating operations optimised to reduce the delay variation of e-2-e measurements (to measure T3)
-    f = myproto() #create a probe packet object
-    e = pkt.ethernet() #create L2 type packet (frame) object
+    # sequence of packet formating operations optimised to reduce the delay variation of e-2-e measurements (to measure T3)
+    f = myproto() # create a probe packet object
+    e = pkt.ethernet() # create L2 type packet (frame) object
     e.src = EthAddr(src_mac)
     e.dst = EthAddr(dst_mac)
-    e.type=0x5577 #set unregistered EtherType in L2 header type field, here assigned to the probe packet type 
-    msg = of.ofp_packet_out() #create PACKET_OUT message object
-    msg.actions.append(of.ofp_action_output(port=port)) #set the output port for the packet in switch0
-    f.timestamp = int(time.time()*1000*10 - start_time) #set the timestamp in the probe packet
-    #print f.timestamp
+    e.type=0x5577 # set unregistered EtherType in L2 header type field, here assigned to the probe packet type 
+    msg = of.ofp_packet_out() # create PACKET_OUT message object
+    msg.actions.append(of.ofp_action_output(port=port)) # set the output port for the packet in switch1
+    f.timestamp = int(time.time()*1000*10 - start_time) # set the timestamp in the probe packet
+    # print f.timestamp
     e.payload = f
     msg.data = e.pack()
     core.openflow.getConnection(src_dpid).send(msg)
-    #print "=====> probe sent: f=", f.timestamp, " after=", int(time.time()*1000*10 - start_time), " [10*ms]"
+    # print "=====> probe sent: f=", f.timestamp, " after=", int(time.time()*1000*10 - start_time), " [10*ms]"
 
-  #the following executes only when a connection to 'switch1' exists (otherwise AttributeError can be raised)
+  # the following executes only when a connection to 'switch1' exists (otherwise AttributeError can be raised)
   if dst_dpid <>0 and not core.openflow.getConnection(dst_dpid) is None:
-    #send out port_stats_request packet through switch1 connection dst_dpid (to measure T2)
+    # send out port_stats_request packet through switch1 connection dst_dpid (to measure T2)
     core.openflow.getConnection(dst_dpid).send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
-    sent_time2=time.time() * 1000*10 - start_time #sending time of stats_req: ctrl => switch1
-    #print "sent_time2:", sent_time2
+    sent_time2=time.time() * 1000*10 - start_time # sending time of stats_req: ctrl => switch1
+    # print "sent_time2:", sent_time2
 
   return sent_time1, sent_time2
 
@@ -152,18 +145,18 @@ def _timer_func ():
   
 
 def _handle_portstats_received (event):
-  #Observe the handling of port statistics provided by this function.
+  # Observe the handling of port statistics provided by this function.
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
   global s2_p1, s3_p1, s4_p1
   global pre_s2_p1, pre_s3_p1, pre_s4_p1
   global OWD1, OWD2, OWD3, OWD4
 
   received_time = time.time() * 1000*10 - start_time
-  #measure T1 as of lab guide
+  # measure T1 as of lab guide
   if event.connection.dpid == s1_dpid:
     OWD1=0.5*(received_time - sent_time1)
  
-  #measure T2 as of lab guide
+  # measure T2 as of lab guide
   elif event.connection.dpid == s2_dpid:
     OWD2=0.5*(received_time - sent_time2)
   
@@ -230,10 +223,11 @@ def _handle_ConnectionUp (event):
       s5_dpid = event.connection.dpid
       print "s5_dpid=", s5_dpid
  
-  # start 1-second recurring loop timer for round-robin routing changes; _timer_func is to be called on timer expiration to change the flow entry in s1
+  # start 1-second recurring loop timer for QoS routung updates; _timer_func is to be called on timer expiration to change the flow entry in s1 and s5
   if s1_dpid<>0 and s2_dpid<>0 and s3_dpid<>0 and s4_dpid<>0 and s5_dpid<>0:
     network_ready = True
     Timer(1, _timer_func, recurring=True)
+    Timer(1, find_matching_link, recurring=True)
 
 def calculate_delay(received_time, d, OWD1, OWD2, link_name):
     global links
@@ -261,10 +255,9 @@ def _handle_PacketIn(event):
   
   global start_time, OWD1, OWD2, links, flag
 
-  received_time = time.time() * 1000*10 - start_time #amount of time elapsed from start_time
+  received_time = time.time() * 1000*10 - start_time # amount of time elapsed from start_time
 
   packet = event.parsed
-  #print packet
   
   if packet.type == 0x5577:
     flag += 1
@@ -289,13 +282,13 @@ def _handle_PacketIn(event):
   # This setting up may happen either at the very first pactet being sent or after flow entry expirationn inn the switch
  
   if event.connection.dpid==s1_dpid:
-     a=packet.find('arp')					# If packet object does not encapsulate a packet of the type indicated, find() returns None
+     a=packet.find('arp')					                      # If packet object does not encapsulate a packet of the type indicated, find() returns None
      if a and a.protodst=="10.0.0.4":
-       msg = of.ofp_packet_out(data=event.ofp)			# Create packet_out message; use the incoming packet as the data for the packet out
-       msg.actions.append(of.ofp_action_output(port=4))		# Add an action to send to the specified port
-       event.connection.send(msg)				# Send message to switch
+       msg = of.ofp_packet_out(data=event.ofp)			    # Create packet_out message; use the incoming packet as the data for the packet out
+       msg.actions.append(of.ofp_action_output(port=4))	# Add an action to send to the specified port
+       event.connection.send(msg)				                # Send message to switch
  
-     if a and a.protodst=="10.0.0.5":
+     if a and a.protodst=="10.0.0.5": 
        msg = of.ofp_packet_out(data=event.ofp)
        msg.actions.append(of.ofp_action_output(port=5))
        event.connection.send(msg)
@@ -685,7 +678,6 @@ def launch ():
 
   req_conn = read_req_conn(conn_req_path)
   print "Requested connections:"
-  Timer(1, find_matching_link, recurring=True)
   for node in req_conn:
     print "\t",node
 
