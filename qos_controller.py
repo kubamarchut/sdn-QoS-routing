@@ -664,10 +664,9 @@ def find_matching_link():
         dst = conn["dst"]
         min_delay = conn["min_delay"]
         for link in available_links:
-          if link.delay <= min_delay * 1.2 and link.connection < MAX_CONNECTIONS_PER_LINK:
-            print "reasign"
-            congested_link.connection -= 1
-            link.connection += 1
+          if link.delay <= min_delay * 1.2 and len(link.connection) < MAX_CONNECTIONS_PER_LINK:
+            congested_link.connection.remove(conn)
+            link.connection.append(conn)
             link_port = int(link.name.split("-")[1][1:])
             dstIP = "10.0.0." + dst[1:]
             srcIP = "10.0.0." + src[1:]
