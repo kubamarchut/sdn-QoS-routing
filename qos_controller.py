@@ -56,11 +56,15 @@ sent_time4 = 0
 sent_time5 = 0
 sent_time6 = 0
 
+network_ready = False
+
 class Link:
   def __init__(self, name, delay=float("inf")):
     self.name = name
+    self.delay_hist = []
     self.delay = delay
-    self.connections = 0
+    self.connection = 0
+    self.congestion = 0
 
 links = {
   "s1-s2": Link("s1-s2"),
@@ -149,76 +153,62 @@ def _timer_func ():
 
 def _handle_portstats_received (event):
   #Observe the handling of port statistics provided by this function.
-
   global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
-  global s1_p1,s1_p4, s1_p5, s1_p6, s2_p1, s3_p1, s4_p1
-  global pre_s1_p1,pre_s1_p4, pre_s1_p5, pre_s1_p6, pre_s2_p1, pre_s3_p1, pre_s4_p1
+  global s2_p1, s3_p1, s4_p1
+  global pre_s2_p1, pre_s3_p1, pre_s4_p1
   global OWD1, OWD2, OWD3, OWD4
 
   received_time = time.time() * 1000*10 - start_time
   #measure T1 as of lab guide
   if event.connection.dpid == s1_dpid:
     OWD1=0.5*(received_time - sent_time1)
-    #print "OWD1: ", OWD1, "ms"
  
-   #measure T2 as of lab guide
+  #measure T2 as of lab guide
   elif event.connection.dpid == s2_dpid:
-    OWD2=0.5*(received_time - sent_time2) #originally sent_time1 was here
-    #print "OWD2: ", OWD2, "ms"
+    OWD2=0.5*(received_time - sent_time2)
   
   elif event.connection.dpid == s3_dpid:
     OWD3=0.5*(received_time - sent_time4)
   
   elif event.connection.dpid == s4_dpid:
     OWD4=0.5*(received_time - sent_time6)
-
-  if event.connection.dpid==s1_dpid: # The DPID of one of the switches involved in the link
+ 
+  if event.connection.dpid==s2_dpid:
     for f in event.stats:
       if int(f.port_no)<65534:
         if f.port_no==1:
-          pre_s1_p1=s1_p1
-          s1_p1=f.rx_packets
-          #print "s1_p1->","TxDrop:", f.tx_dropped,"RxDrop:",f.rx_dropped,"TxErr:",f.tx_errors,"CRC:",f.rx_crc_err,"Coll:",f.collisions,"Tx:",f.tx_packets,"Rx:",f.rx_packets
-        if f.port_no==4:
-          pre_s1_p4=s1_p4
-          s1_p4=f.tx_packets
-          #s1_p4=f.tx_bytes
-          #print "s1_p4->","TxDrop:", f.tx_dropped,"RxDrop:",f.rx_dropped,"TxErr:",f.tx_errors,"CRC:",f.rx_crc_err,"Coll:",f.collisions,"Tx:",f.tx_packets,"Rx:",f.rx_packets
-        if f.port_no==5:
-          pre_s1_p5=s1_p5
-          s1_p5=f.tx_packets
-        if f.port_no==6:
-          pre_s1_p6=s1_p6
-          s1_p6=f.tx_packets
- 
-  if event.connection.dpid==s2_dpid:
-     for f in event.stats:
-       if int(f.port_no)<65534:
-         if f.port_no==1:
-           pre_s2_p1=s2_p1
-           s2_p1=f.rx_packets
-           #s2_p1=f.rx_bytes
-     #print getTheTime(), "s1_p4(Sent):", (s1_p4-pre_s1_p4), "s2_p1(Received):", (s2_p1-pre_s2_p1)
+          pre_s2_p1=s2_p1
+          #s2_p1=f.rx_packets
+          s2_p1=f.rx_bytes
+          congestion = s2_p1 - pre_s2_p1
+          links["s1-s2"].congestion = congestion
+    #print getTheTime(), "s2_p1(Received):", congestion
  
   if event.connection.dpid==s3_dpid:
-     for f in event.stats:
-       if int(f.port_no)<65534:
-         if f.port_no==1:
-           pre_s3_p1=s3_p1
-           s3_p1=f.rx_packets
-     #print getTheTime(), "s1_p5(Sent):", (s1_p5-pre_s1_p5), "s3_p1(Received):", (s3_p1-pre_s3_p1)
+    for f in event.stats:
+      if int(f.port_no)<65534:
+        if f.port_no==1:
+          pre_s3_p1=s3_p1
+          #s3_p1=f.rx_packets
+          s3_p1=f.rx_bytes
+          congestion = s3_p1 - pre_s3_p1
+          links["s1-s3"].congestion = congestion
+    #print getTheTime(), "s3_p1(Received):", congestion
 
   if event.connection.dpid==s4_dpid:
-     for f in event.stats:
-       if int(f.port_no)<65534:
-         if f.port_no==1:
-           pre_s4_p1=s4_p1
-           s4_p1=f.rx_packets
-     #print getTheTime(), "s1_p6(Sent):", (s1_p6-pre_s1_p6), "s4_p1(Received):", (s4_p1-pre_s4_p1)
+    for f in event.stats:
+      if int(f.port_no)<65534:
+        if f.port_no==1:
+          pre_s4_p1=s4_p1
+          #s4_p1=f.rx_packets
+          s4_p1=f.rx_bytes
+          congestion = s4_p1 - pre_s4_p1
+          links["s1-s4"].congestion = congestion
+    #print getTheTime(), "s4_p1(Received):", congestion
 
 def _handle_ConnectionUp (event):
   # waits for connections from all switches, after connecting to all of them it starts a round robin timer for triggering h1-h4 routing changes
-  global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid
+  global s1_dpid, s2_dpid, s3_dpid, s4_dpid, s5_dpid, network_ready
   print "ConnectionUp: ",dpidToStr(event.connection.dpid)
  
   #remember the connection dpid for the switch
@@ -242,16 +232,18 @@ def _handle_ConnectionUp (event):
  
   # start 1-second recurring loop timer for round-robin routing changes; _timer_func is to be called on timer expiration to change the flow entry in s1
   if s1_dpid<>0 and s2_dpid<>0 and s3_dpid<>0 and s4_dpid<>0 and s5_dpid<>0:
+    network_ready = True
     Timer(1, _timer_func, recurring=True)
 
 def calculate_delay(received_time, d, OWD1, OWD2, link_name):
     global links
     delay_c = int((received_time - d - OWD1 - OWD2) / 10)
-    links[link_name].delay = delay_c
+    links[link_name].delay_hist.append(delay_c)
+    links[link_name].delay = sum(links[link_name].delay_hist[-2:]) / 2
 
 flag = 0
 
-def setPath(dpid, dstIP, port):
+def setPath(dpid, srcIP, dstIP, port):
   if dpid<>0:
     msg = of.ofp_flow_mod()
     msg.command=of.OFPFC_MODIFY_STRICT
@@ -260,6 +252,7 @@ def setPath(dpid, dstIP, port):
     msg.hard_timeout = 0
     msg.match.dl_type = 0x0800
     msg.match.nw_dst = str(dstIP)
+    #msg.match.nw_src = str(srcIP)
     msg.actions.append(of.ofp_action_output(port = port+2))
     core.openflow.getConnection(dpid).send(msg)
 
@@ -595,9 +588,6 @@ def _handle_PacketIn(event):
      msg.actions.append(of.ofp_action_output(port = 6))
      event.connection.send(msg)
 
-#As usually, launch() is the function called by POX to initialize the component (controller.py in our case) 
-#indicated by a parameter provided to pox.py 
-
 def read_req_conn(file_path):
   try:
       with open(file_path, 'r') as file:
@@ -611,31 +601,47 @@ req_conn = []
 MAX_CONNECTIONS_PER_LINK = 3
 
 def find_matching_link():
-  global links, req_conn, s1_dpid, s5_dpid
+  global links, req_conn, s1_dpid, s5_dpid, network_ready, MAX_CONNECTIONS_PER_LINK
+  if not network_ready:
+    print "could not set path"
+    return
+
+  total_congestion = float(links["s1-s2"].congestion + links["s1-s3"].congestion + links["s1-s4"].congestion) / 100
+  if total_congestion<>0:
+    links["s1-s2"].congestion = links["s1-s2"].congestion / total_congestion
+    links["s1-s3"].congestion = links["s1-s3"].congestion / total_congestion
+    links["s1-s4"].congestion = links["s1-s4"].congestion / total_congestion
+    print "congestion: %.2f, %.2f, %.2f" % (links["s1-s2"].congestion, links["s1-s3"].congestion, links["s1-s4"].congestion)
+  else:
+    print "congestion: ", 0, 0, 0
 
   sorted_links = sorted(links.values(), key=lambda link: link.delay, reverse=True)
   for link in sorted_links: 
-    link.connection = 0
+    link.connection = []
 
   print "path for:",
   paths = []
   links_choosen = []
   for node in req_conn:
-    paths.append(node["src"] + "<->" + node["dst"])
+    src = node["src"]
+    dst = node["dst"]
+    min_delay = node["min_delay"]
+
+    paths.append(src + "<->" + dst)
     matching_path_found = False
+
     for link in sorted_links:
-      if node["min_delay"] > (link.delay * 1.2) and link.connection < MAX_CONNECTIONS_PER_LINK:
+      if link.delay <= min_delay * 1.2 and len(link.connection) < MAX_CONNECTIONS_PER_LINK:
         matching_path_found = True
-        link.connection += 1
+        link.connection.append(node)
         links_choosen.append(link.name)
         link_port = int(link.name.split("-")[1][1:])
-        dstIP = "10.0.0." + node["dst"][1:]
-        srcIP = "10.0.0." + node["src"][1:]
-        setPath(s1_dpid, dstIP, link_port)
-        setPath(s5_dpid, srcIP, link_port-3)
-
-
+        dstIP = "10.0.0." + dst[1:]
+        srcIP = "10.0.0." + src[1:]
+        setPath(s1_dpid, srcIP, dstIP, link_port)
+        setPath(s5_dpid, dstIP, srcIP, link_port-3)
         break
+
     if not matching_path_found:
       links_choosen.append("None")
 
@@ -643,11 +649,36 @@ def find_matching_link():
     print path, link + " | ",
   
   print ""
+  # Load redistribution if a link is congested
+  congested_link = None
+  for link in sorted_links:
+    if link.congestion > 85:
+      congested_link = link
+      break
+
+  if congested_link:
+    available_links = [link for link in sorted_links if link != congested_link]
+    if available_links:
+      for conn in congested_link.connection:
+        src = conn["src"]
+        dst = conn["dst"]
+        min_delay = conn["min_delay"]
+        for link in available_links:
+          if link.delay <= min_delay * 1.2 and link.connection < MAX_CONNECTIONS_PER_LINK:
+            print "reasign"
+            congested_link.connection -= 1
+            link.connection += 1
+            link_port = int(link.name.split("-")[1][1:])
+            dstIP = "10.0.0." + dst[1:]
+            srcIP = "10.0.0." + src[1:]
+            setPath(s1_dpid, srcIP, dstIP, link_port)
+            setPath(s5_dpid, dstIP, srcIP, link_port - 3)
+            break
     
 
 def launch ():
   global start_time, req_conn
-  start_time = time.time() * 1000*10 # factor *10 applied to increase the accuracy for short delays (capture tenths of ms)
+  start_time = time.time() * 1000*10 # factor * 10 applied to increase the accuracy for short delays (capture tenths of ms)
   print "start:", start_time/10
 
   conn_req_path = "/home/student/Desktop/projekt/conn_req_parralel.json"
@@ -659,12 +690,9 @@ def launch ():
   for node in req_conn:
     print "\t",node
 
-  # core is an instance of class POXCore (EventMixin) and it can register objects.
-  # An object with name xxx can be registered to core instance which makes this object become a "component" available as pox.core.core.xxx.
-  # for examples see e.g. https://noxrepo.github.io/pox-doc/html/#the-openflow-nexus-core-openflow 
-  core.openflow.addListenerByName("PortStatsReceived",_handle_portstats_received) # listen for port stats , https://noxrepo.github.io/pox-doc/html/#statistics-events
-  core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp) # listen for the establishment of a new control channel with a switch, https://noxrepo.github.io/pox-doc/html/#connectionup
-  core.openflow.addListenerByName("PacketIn",_handle_PacketIn) # listen for the reception of packet_in message from switch, https://noxrepo.github.io/pox-doc/html/#packetin
+  core.openflow.addListenerByName("PortStatsReceived",_handle_portstats_received)
+  core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp)
+  core.openflow.addListenerByName("PacketIn",_handle_PacketIn)
   
 
   

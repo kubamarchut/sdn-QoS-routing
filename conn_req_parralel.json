@@ -8,12 +8,12 @@
       {
         "src": "h2",
         "dst": "h5",
-        "min_delay": 320
+        "min_delay": 100
       },
       {
         "src": "h3",
         "dst": "h6",
-        "min_delay": 40
+        "min_delay": 500
       }
     ]
   }
